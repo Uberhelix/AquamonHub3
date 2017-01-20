@@ -208,12 +208,20 @@ void loop() {
     Serial.print('[');Serial.print(radio.SENDERID);Serial.print("] ");
     ToIOT((char*)radio.DATA); //Send packet to IOT server function
     Serial.print("   [RX_RSSI:");Serial.print(radio.RSSI);Serial.print("]");
+    ToMQTT();
   }
 
   radio.receiveDone(); //put radio in RX mode
   Serial.flush(); //make sure all serial data is clocked out before sleeping the MCU
 
-/********************* MQTT Demo *****************************/
+
+}
+
+//****FUNCTIONS****
+
+void ToMQTT()
+{
+ /********************* MQTT Demo *****************************/
 
 // Ensure the connection to the MQTT server is alive (this will make the first
   // connection and automatically reconnect when disconnected).  See the MQTT_connect
@@ -237,10 +245,8 @@ void loop() {
     mqtt.disconnect();
   }
 
-/******************** End of MQTT Demo **********************/ 
+/******************** End of MQTT Demo **********************/  
 }
-
-//****FUNCTIONS****
 
 void Blink(byte PIN, byte DELAY_MS, byte loops)
 {

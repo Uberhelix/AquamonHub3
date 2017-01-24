@@ -188,9 +188,15 @@ void setup() {
 
 //----------------For io.adafruit.com
 // Initialise the Client
-  Serial.print(F("\nInit the Client..."));
-  Ethernet.begin(mac);
-  delay(1000); //give the ethernet a second to initialize
+if (Ethernet.begin(mac) == 0) {
+    Serial.println("Failed to configure Ethernet using DHCP");
+    // no point in carrying on, so do nothing forevermore:
+    // try to congifure using IP address instead of DHCP:
+    //Ethernet.begin(mac, ip);
+  }
+  // give the Ethernet shield a second to initialize:
+  delay(1000);
+  Serial.println("connecting...");
 
  
 }
@@ -200,19 +206,27 @@ uint32_t x=0;
 
 
 void loop() {
-  //Serial.print("*");
-  //check if something was received (could be an interrupt from the radio)
-  if (radio.receiveDone())
-  {
-    //print message received to serial
-    Serial.print('[');Serial.print(radio.SENDERID);Serial.print("] ");
-    ToIOT((char*)radio.DATA); //Send packet to IOT server function
-    Serial.print("   [RX_RSSI:");Serial.print(radio.RSSI);Serial.print("]");
-    ToMQTT();
+  // Ensure the connection to the MQTT server is alive (this will make the first
+  // connection and automatically reconnect when disconnected).  See the MQTT_connect
+  // function definition further below.
+  MQTT_connect();
+
+  
+
+  // Now we can publish stuff!
+  Serial.print(F("\nSending photocell val "));
+  Serial.print(x);
+  Serial.print("...");
+  if (! photocell.publish(x++)) {
+    Serial.println(F("Failed"));
+  } else {
+    Serial.println(F("OK!"));
   }
 
-  radio.receiveDone(); //put radio in RX mode
-  Serial.flush(); //make sure all serial data is clocked out before sleeping the MCU
+  // ping the server to keep the mqtt connection alive
+  if(! mqtt.ping()) {
+    mqtt.disconnect();
+  }
 
 
 }

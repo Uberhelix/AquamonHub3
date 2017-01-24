@@ -200,7 +200,7 @@ uint32_t x=0;
 
 
 void loop() {
-  Serial.print("*");
+  //Serial.print("*");
   //check if something was received (could be an interrupt from the radio)
   if (radio.receiveDone())
   {
@@ -229,7 +229,7 @@ void ToMQTT()
   MQTT_connect();
 
   // Now we can publish stuff!
-  Serial.print(F("\nSending photocell val "));
+  Serial.print(F("\nSending sensor val "));
   Serial.print(find_value("Data=",StringPacket));
   Serial.print("...");
 
@@ -268,9 +268,12 @@ void ToIOT(char *ptrpacket){
   float Node = find_value("NodeId=",StringPacket);
   String sensorName = find_stringValue("Sensor=",StringPacket);
   float Data = find_value("Data=",StringPacket); //This needs to be turned into float
-  
+
+  Serial.print("Sensor=");
+  Serial.println(sensorName);
   Serial.print("Data=");
   Serial.println(Data);
+
   
   /*if (! photocell.publish(Data)) {
     Serial.println(F("Failed"));

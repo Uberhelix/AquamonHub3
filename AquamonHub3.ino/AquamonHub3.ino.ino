@@ -34,7 +34,7 @@
 #include <SPI.h>
 #include "Adafruit_MQTT.h"
 #include "Adafruit_MQTT_Client.h"
-#include <Ethernet.h> 
+#include <Ethernet2.h> 
 #include <EthernetClient.h>
 #include <Dns.h>
 #include <Dhcp.h>
@@ -82,7 +82,7 @@ String StringPacket; //For parseing packet;
 byte mac[] = {0x74,0x69,0x69,0x2D,0x30,0x31};
 
 //Uncomment the following, and set to a valid ip if you don't have dhcp available.
-//IPAddress iotIP (192, 168, 0, 42);
+IPAddress ip(192, 168, 0, 42);
 //Uncomment the following, and set to your preference if you don't have automatic dns.
 //IPAddress dnsIP (8, 8, 8, 8);
 //If you uncommented either of the above lines, make sure to change "Ethernet.begin(mac)" to "Ethernet.begin(mac, iotIP)" or "Ethernet.begin(mac, iotIP, dnsIP)"
@@ -101,6 +101,25 @@ byte mac[] = {0x74,0x69,0x69,0x2D,0x30,0x31};
 
 //Set up the ethernet client
 EthernetClient client;
+
+unsigned long lastConnectionTime = 0;             // last time you connected to the server, in milliseconds
+const unsigned long postingInterval = 10L * 1000L; // delay between updates, in milliseconds
+// the "L" is needed to use long type numbers
+
+//#define WIZ_RESET 9
+
+#if defined(ESP8266)
+  // default for ESPressif
+  #define WIZ_CS 15
+#elif defined(ARDUINO_STM32_FEATHER)
+  // default for WICED
+  #define WIZ_CS PB4
+#elif defined(TEENSYDUINO)
+  #define WIZ_CS 10
+#else
+  // default for 32u4 and m0
+  #define WIZ_CS 10
+#endif
 
 Adafruit_MQTT_Client mqtt(&client, AIO_SERVER, AIO_SERVERPORT, AIO_USERNAME, AIO_KEY);
 
@@ -147,11 +166,51 @@ void setup() {
  pinMode(8, OUTPUT);
   digitalWrite(8, HIGH);
 
+//For Ethernet
+#if defined(WIZ_RESET)
+  pinMode(WIZ_RESET, OUTPUT);
+  digitalWrite(WIZ_RESET, HIGH);
+  delay(100);
+  digitalWrite(WIZ_RESET, LOW);
+  delay(100);
+  digitalWrite(WIZ_RESET, HIGH);
+#endif
+
+//#if !defined(ESP8266) 
+//  while (!Serial); // wait for serial port to connect.
+//#endif
+
+  // Open serial communications and wait for port to open:
+  //Serial.begin(115200);
+  delay(1000);
+  Serial.println("\nHello! I am the Ethernet FeatherWing");
+
+   pinMode(8, OUTPUT);
+  digitalWrite(8, HIGH);
+
+  Ethernet.init(WIZ_CS);
+  
+  // give the ethernet module time to boot up:
+  delay(1000);
+
+  // start the Ethernet connection:
+  if (Ethernet.begin(mac) == 0) {
+    Serial.println("Failed to configure Ethernet using DHCP");
+    // no point in carrying on, so do nothing forevermore:
+    // try to congifure using IP address instead of DHCP:
+    Serial.println("Full addressing");
+    Ethernet.begin(mac, ip);
+  }
+  
+  // print the Ethernet board/shield's IP address:
+  Serial.print("My IP address: ");
+  Serial.println(Ethernet.localIP());
+
 //----------------For io.adafruit.com
 // Initialise the Client
-  Serial.print(F("\nInit the Client..."));
-  Ethernet.begin(mac);
-  delay(1000); //give the ethernet a second to initialize
+//  Serial.print(F("\nInit the Client..."));
+//  Ethernet.begin(mac);
+//  delay(1000); //give the ethernet a second to initialize
 
  
 }

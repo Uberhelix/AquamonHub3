@@ -55,61 +55,19 @@
 //*********************************************************************************************
 #define SERIAL_BAUD   115200
 
-/*for Feather 32u4
-#define RFM69_CS      8
-#define RFM69_IRQ     7
-#define RFM69_IRQN    4  // Pin 7 is IRQ 4!
-#define RFM69_RST     4
-*/
-
-/*for Feather M0 
+//for Feather M0 
 #define RFM69_CS      8
 #define RFM69_IRQ     3
 #define RFM69_IRQN    3  // Pin 3 is IRQ 3!
 #define RFM69_RST     4
-*/
 
-/* ESP8266 feather w/wing
-#define RFM69_CS      2
-#define RFM69_IRQ     15
-#define RFM69_IRQN    digitalPinToInterrupt(RFM69_IRQ )
-#define RFM69_RST     16
-*/
 
-/* Feather 32u4 w/wing
-#define RFM69_CS      10   // "B"
-#define RFM69_RST     11   // "A"
-#define RFM69_IRQ     2    // "SDA" (only SDA/SCL/RX/TX have IRQ!)
-#define RFM69_IRQN    digitalPinToInterrupt(RFM69_IRQ )
-*/
-
-/* Feather m0 w/wing
-#define RFM69_CS      10   // "B"
-#define RFM69_RST     11   // "A"
-#define RFM69_IRQ     6    // "D"
-#define RFM69_IRQN    digitalPinToInterrupt(RFM69_IRQ )
-*/
-
-/* Teensy 3.x w/wing
-#define RFM69_RST     9   // "A"
-#define RFM69_CS      10   // "B"
-#define RFM69_IRQ     4    // "C"
-#define RFM69_IRQN    digitalPinToInterrupt(RFM69_IRQ )
-*/
-
-/* WICED Feather w/wing
-#define RFM69_RST     PA4     // "A"
-#define RFM69_CS      PB4     // "B"
-#define RFM69_IRQ     PA15    // "C"
-#define RFM69_IRQN    RFM69_IRQ
-*/
-
-//Breakout
+/*Breakout
 #define RFM69_CS      8//was 10
 #define RFM69_IRQ     2
 #define RFM69_IRQN    0  // Pin 2 is IRQ 0!
 #define RFM69_RST     9
-
+*/
 
 #define LED           13  // onboard blinky
 //#define LED           0 //use 0 on ESP8266
@@ -185,6 +143,9 @@ void setup() {
   Serial.print("\nListening at ");
   Serial.print(FREQUENCY==RF69_433MHZ ? 433 : FREQUENCY==RF69_868MHZ ? 868 : 915);
   Serial.println(" MHz");
+
+ pinMode(8, OUTPUT);
+  digitalWrite(8, HIGH);
 
 //----------------For io.adafruit.com
 // Initialise the Client
